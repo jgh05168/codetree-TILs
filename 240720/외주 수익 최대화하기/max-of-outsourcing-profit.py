@@ -4,9 +4,7 @@
 
 외주 수익 최대값을 출력
 
-기간 안에 조합하여 최댓값 찾기 = 백트래킹
-n <= 15이기 때문에 조합으로 충분히 찾을 수 있을듯
-수익이 큰 경우부터 넣어보는 방법으로 정렬한 뒤 진행
+dp, 최댓값 업데이트 해주는 방식으로 진행
 '''
 
 import sys
@@ -18,18 +16,12 @@ for i in range(n):
     t, p = map(int, input().split())
     outgoing.append((t, p))
 
-ans = 0
-for i in range(n):
-    tmp_ans = 0
-    selected = [0] * n
-    # 하나씩 놓아가면서 dp에 최댓값 채워넣기
-    for j in range(i, n):
-        t, p = outgoing[j]
-        if not selected[j]:
-            for k in range(t):
-                selected[i + k] = 1
-            tmp_ans += p
+dp = [0] * (n + 1)
+for i in range(n - 1, -1, -1):
+    # 일을 할 수 있다면
+    if i + outgoing[i][0] <= n:
+        dp[i] = max(dp[i + outgoing[i][0]] + outgoing[i][1], dp[i + 1])
+    else:
+        dp[i] = dp[i + 1]
 
-    ans = max(ans, tmp_ans)
-
-print(ans)
+print(dp[0])
