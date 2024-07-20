@@ -90,6 +90,7 @@ for i in range(n):
         if grid[i][j]:
             if grid[i][j] == 9:
                 robot_r, robot_c = i, j
+                grid[i][j] = 0
 
 robot_level = 2
 need_monster = 2
