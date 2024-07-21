@@ -23,6 +23,7 @@ def calc_path(hospitals):
         visited[sr][sc] = 0
     patients = people
     tmp_ans = 0
+    count_time = 0
     while True:
         new_queue = deque()
         while queue:
@@ -37,8 +38,12 @@ def calc_path(hospitals):
                     if grid[nr][nc] == 1:
                         patients -= 1
                         tmp_ans += visited[nr][nc]
+        count_time += 1
         if not patients:
             break
+        # 가지치기
+        if count_time > ans:
+            return int(1e9)
 
     return tmp_ans
 
