@@ -7,6 +7,11 @@ dfs : 조합을 사용하여 병원을 선택한다.
 
 - 장애물 없음
 - 이동 거리는 절대거리로 계산
+
+------- 시초 -------
+bfs로 거리 구하면 시초난다.
+
+-> 그냥 방문했다면 abs 를 통해 거리를 구해서 더하자.(사람별로)
 '''
 
 from collections import deque
@@ -42,7 +47,7 @@ def calc_path(hospitals):
         if not patients:
             break
         # 가지치기
-        if count_time > ans:
+        if count_time > ans or tmp_ans > ans:
             return int(1e9)
 
     return tmp_ans
