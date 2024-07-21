@@ -28,27 +28,21 @@ def calc_path(hospitals):
         visited[sr][sc] = 0
     patients = people
     tmp_ans = 0
-    count_time = 0
-    while True:
-        new_queue = deque()
-        while queue:
-            r, c = queue.popleft()
 
-            for d in range(len(dr)):
-                nr, nc = r + dr[d], c + dc[d]
-                if 0 <= nr < n and 0 <= nc < n and visited[nr][nc] == -1:
-                    visited[nr][nc] = visited[r][c] + 1
-                    queue.append((nr, nc))
-                    # 사람을 발견한 경우
-                    if grid[nr][nc] == 1:
-                        patients -= 1
-                        tmp_ans += visited[nr][nc]
-        count_time += 1
+    while queue:
+        r, c = queue.popleft()
+
+        for d in range(len(dr)):
+            nr, nc = r + dr[d], c + dc[d]
+            if 0 <= nr < n and 0 <= nc < n and visited[nr][nc] == -1:
+                visited[nr][nc] = visited[r][c] + 1
+                queue.append((nr, nc))
+                # 사람을 발견한 경우
+                if grid[nr][nc] == 1:
+                    patients -= 1
+                    tmp_ans += visited[nr][nc]
         if not patients:
             break
-        # 가지치기
-        if count_time > ans or tmp_ans > ans:
-            return int(1e9)
 
     return tmp_ans
 
