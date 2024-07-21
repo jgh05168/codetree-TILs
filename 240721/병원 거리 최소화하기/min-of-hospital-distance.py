@@ -49,16 +49,16 @@ def calc_path():
 
     return tmp_ans
 
-def dfs(choose):
+def dfs(choose, idx):
     global ans
     if choose == m:
         ans = min(ans, calc_path())
     else:
-        for i in range(choose, len(hospitals)):
+        for i in range(idx, len(hospitals)):
             if not selected[i]:
                 selected[i] = 1
                 selec_hospitals[hospitals[i][0]][hospitals[i][1]] = 1
-                dfs(choose + 1)
+                dfs(choose + 1, i)
                 selec_hospitals[hospitals[i][0]][hospitals[i][1]] = 0
                 selected[i] = 0
 
@@ -77,6 +77,6 @@ for i in range(n):
 selected = [0] * len(hospitals)
 selec_hospitals = [[0] * n for _ in range(n)]
 ans = int(1e9)
-dfs(0)
+dfs(0, 0)
 
 print(ans)
