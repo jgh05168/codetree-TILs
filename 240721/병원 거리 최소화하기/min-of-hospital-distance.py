@@ -21,11 +21,14 @@ input = sys.stdin.readline
 dr = [0, 1, 0, -1]
 dc = [1, 0, -1, 0]
 
-def calc_path(hospitals):
-    queue = deque(hospitals)
+def calc_path():
+    queue = deque()
     visited = [[-1] * n for _ in range(n)]
-    for sr, sc in hospitals:
-        visited[sr][sc] = 0
+    for i in range(n):
+        for j in range(n):
+            if selec_hospitals[i][j]:
+                queue.append((i, j))
+                visited[i][j] = 0
     patients = people
     tmp_ans = 0
 
@@ -46,15 +49,17 @@ def calc_path(hospitals):
 
     return tmp_ans
 
-def dfs(choose, chosen):
+def dfs(choose):
     global ans
     if choose == m:
-        ans = min(ans, calc_path(chosen))
+        ans = min(ans, calc_path())
     else:
         for i in range(choose, len(hospitals)):
             if not selected[i]:
                 selected[i] = 1
-                dfs(choose + 1, chosen + [hospitals[i]])
+                selec_hospitals[hospitals[i][0]][hospitals[i][1]] = 1
+                dfs(choose + 1)
+                selec_hospitals[hospitals[i][0]][hospitals[i][1]] = 0
                 selected[i] = 0
 
 
@@ -70,8 +75,8 @@ for i in range(n):
         elif grid[i][j] == 2:
             hospitals.append((i, j))
 selected = [0] * len(hospitals)
-
+selec_hospitals = [[0] * n for _ in range(n)]
 ans = int(1e9)
-dfs(0, [])
+dfs(0)
 
 print(ans)
