@@ -12,6 +12,7 @@ bfs + 완탐
 2. 손님까지 이동한다.
 3. 손님의 목적지까지 이동한다.
 4. 1 ~ 3 반복
+
 '''
 
 from collections import deque
@@ -50,6 +51,9 @@ def find_passenger(sr, sc):
             tmp_r, tmp_c = heapq.heappop(passenger_list)
             battery -= visited[tmp_r][tmp_c]
             break
+        # 길이 막힌 경우 그대로 종료
+        elif not new_queue:
+            return False, -1, -1
         else:
             queue = new_queue
 
