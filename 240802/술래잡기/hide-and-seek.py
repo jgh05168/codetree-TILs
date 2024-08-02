@@ -52,8 +52,6 @@ def thief_move():
             # 움직이려는 칸에 술래가 없다면, 이동
             if (nr, nc) != (police_r, police_c):
                 thiefs[thief_num] = (nr, nc, d)
-            if grid[r][c] != -1:
-                grid[r][c] = 0
     # 도둑 위치 업데이트
     for thief_num in range(len(thiefs)):
         if not thiefs[thief_num]:
@@ -61,13 +59,12 @@ def thief_move():
         r, c, d = thiefs[thief_num]
         if grid[r][c] == -1:
             continue
-        grid[r][c] = thief_num
 
 def police_move(pr, pc, pd):
     global spin
     if not spin:
         nr, nc, nd = path[pr][pc]
-        if (nr, nc) == (-1, 0):
+        if (nr, nc) == (0, 0):
             spin = (spin + 1) % 2
             visited[0][0] = 1
             return 0, 0, 2
@@ -92,21 +89,15 @@ def police_move(pr, pc, pd):
 def catch_thief():
     x1, x2, y1, y2 = police_r + dr[police_d], police_r + dr[police_d] * 2, police_c + dc[police_d], police_c + dc[police_d] * 2
     tmp = 0
-    # 경찰 칸 확인
-    if 0 <= police_r < n and 0 <= police_c < n and grid[police_r][police_c] > 0:
-        tmp += 1
-        thiefs[grid[police_r][police_c]] = 0
-        grid[police_r][police_c] = 0
-    # 첫번째 칸부터
-    if 0 <= x1 < n and 0 <= y1 < n and grid[x1][y1] > 0:
-        tmp += 1
-        thiefs[grid[x1][y1]] = 0
-        grid[x1][y1] = 0
-    # 두번째 칸 확인
-    if 0 <= x2 < n and 0 <= y2 < n and grid[x2][y2] > 0:
-        tmp += 1
-        thiefs[grid[x2][y2]] = 0
-        grid[x2][y2] = 0
+    for i in range(len(thiefs)):
+        if not thiefs[i]:
+            continue
+        tr, tc, _ = thiefs[i]
+        if grid[tr][tc] == -1:
+            continue
+        if (tr, tc) == (police_r, police_c) or (tr, tc) == (x1, y1) or (tr, tc) == (x2, y2):
+            thiefs[i] = 0
+            tmp += 1
 
     return tmp
 
@@ -120,7 +111,6 @@ for i in range(1, m + 1):
         thiefs.append((sx - 1, sy - 1, 1))
     else:
         thiefs.append((sx - 1, sy - 1, 2))
-    grid[sx - 1][sy - 1] = i
 for _ in range(h):
     sx, sy = map(int, input().split())
     grid[sx - 1][sy - 1] = -1
