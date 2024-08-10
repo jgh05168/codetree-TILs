@@ -42,7 +42,7 @@ def bfs(sr, sc, team_num):
         for d in range(len(dr)):
             nr, nc = r + dr[d], c + dc[d]
             if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and grid[nr][nc]:
-                if grid[nr][nc] <= grid[team_path[0][0]][team_path[0][1]]:
+                if grid[nr][nc] + 1 == grid[r][c] or grid[nr][nc] == 2:
                     team_path.appendleft((nr, nc))
                     member_cnt += 1
                     visited[nr][nc] = team_num
@@ -72,10 +72,19 @@ def init():
 def move_runner():
     for team_idx in range(m):
         team, members = teams[team_idx]
-        team.appendleft(team.pop())
-        for idx in range(1, members + 2):
-            grid[team[idx - 1][0]][team[idx - 1][1]] = grid[team[idx][0]][team[idx][1]]
-
+        er, ec = team.pop()
+        tmp_val = grid[er][ec]
+        team.appendleft((er, ec))
+        for idx in range(1, members + 1):
+            try:
+                grid[team[idx - 1][0]][team[idx - 1][1]] = grid[team[idx][0]][team[idx][1]]
+            except:
+                idx += 1
+                break
+        if idx > members:
+            grid[team[-1][0]][team[-1][1]] = tmp_val
+        else:
+            grid[team[idx][0]][team[idx][1]] = tmp_val
 
 def change_move(team_idx):
     team, members = teams[team_idx]
