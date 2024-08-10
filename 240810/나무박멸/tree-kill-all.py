@@ -129,6 +129,7 @@ for _ in range(M):
     grid = breeding()
 
     # 3 - 1. 제초제 살포 확인
+    tree_loc.sort(key=lambda x: (x[0], x[1]))
     for i, j in tree_loc:
         remove_tree(i, j)
 
