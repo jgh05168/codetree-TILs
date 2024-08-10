@@ -97,6 +97,7 @@ def remove_tree(sr, sc):
 def spread_herbicide():
     for r, c in herbicide:
         herbicide_grid[r][c] = C + 1
+        # # 이거 때문에 벽 부분을 사전에 체크해주었어야 함 (85번째 줄 조건)
         grid[r][c] = 0
     new_tree_loc = list(set(tree_loc).difference(set(herbicide)))
     return new_tree_loc
