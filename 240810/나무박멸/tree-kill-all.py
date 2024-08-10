@@ -63,7 +63,8 @@ def breeding():
                 tmp_new_tree.append((nr, nc))
         for nr, nc in tmp_new_tree:
             new_grid[nr][nc] += tree_level // can_grow
-        new_tree.extend(tmp_new_tree)
+            if new_grid[nr][nc] > 0:
+                new_tree.append((nr, nc))
     tree_loc.extend(new_tree)
 
     return new_grid
@@ -81,6 +82,8 @@ def remove_tree(sr, sc):
         nr, nc = r + ddr[d], c + ddc[d]
         nspread = spread + 1
         if 0 <= nr < N and 0 <= nc < N and nspread <= K:
+            if grid[nr][nc] == -1:
+                continue
             if grid[nr][nc] > 0:
                 tmp_rm_cnt += grid[nr][nc]
                 queue.append((nr, nc, d, spread + 1))
@@ -104,6 +107,7 @@ def decrease_herbicide():
         for j in range(N):
             if herbicide_grid[i][j] > 0:
                 herbicide_grid[i][j] -= 1
+
 
 
 N, M, K, C = map(int, input().split())
