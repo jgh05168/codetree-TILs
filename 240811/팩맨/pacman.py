@@ -77,10 +77,12 @@ def pack_move(move_cnt, get_mon, r, c, mon_locs):
         for d in range(4):
             nr, nc = r + pack_dr[d], c + pack_dc[d]
             # 격자 밖으로만 안나가게 설정
-            if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc]:
-                visited[nr][nc] = 1
-                pack_move(move_cnt + 1, get_mon + len(grid[nr][nc]), nr, nc, mon_locs + [(nr, nc)])
-                visited[nr][nc] = 0
+            if 0 <= nr < n and 0 <= nc < n:
+                if (nr, nc) in mon_locs:
+                    new_get_mon = get_mon
+                else:
+                    new_get_mon = get_mon + len(grid[nr][nc])
+                pack_move(move_cnt + 1, new_get_mon, nr, nc, mon_locs + [(nr, nc)])
 
 def goodbye_mon():
     for i in range(n):
@@ -124,8 +126,8 @@ for _ in range(t):
     # 3. 팩맨 출발
     eaten_mon_cnt = 0
     eaten_mon_list = []
-    visited = [[0] * n for _ in range(n)]
-    visited[pack_r][pack_c] = 1
+    # visited = [[0] * n for _ in range(n)]
+    # visited[pack_r][pack_c] = 1
     pack_move(0, 0, pack_r, pack_c, [])
 
     # 4. 몬스터 시체 처리
