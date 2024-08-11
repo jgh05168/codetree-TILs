@@ -88,15 +88,17 @@ def goodbye_mon():
             if dead_monster[i][j] > 0:
                 dead_monster[i][j] -= 1
     for r, c in eaten_mon_list:
-        dead_monster[r][c] = 2
-        grid[r][c] = deque()
+        if grid[r][c]:
+            dead_monster[r][c] = 2
+            grid[r][c] = deque()
 
 
 def baby_mon():
     for i in range(n):
         for j in range(n):
             if monster_eggs[i][j]:
-                grid[i][j].append(monster_eggs[i][j].popleft())
+                while monster_eggs[i][j]:
+                    grid[i][j].append(monster_eggs[i][j].popleft())
 
 
 n = 4
