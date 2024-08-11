@@ -124,7 +124,7 @@ for _ in range(t):
     grid = mon_move()
 
     # 3. 팩맨 출발
-    eaten_mon_cnt = 0
+    eaten_mon_cnt = -1
     eaten_mon_list = []
     # visited = [[0] * n for _ in range(n)]
     # visited[pack_r][pack_c] = 1
