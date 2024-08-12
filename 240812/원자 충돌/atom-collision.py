@@ -27,61 +27,53 @@ dc = [0, 1, 1, 1, 0, -1, -1, -1]
 
 
 def move_atoms():
-    new_grid = [[deque() * n for _ in range(n)] for _ in range(n)]
-    for i in range(n):
-        for j in range(n):
-            if grid[i][j]:
-                while grid[i][j]:
-                    r, c, m, s, d = grid[i][j].popleft()
-                    nr, nc = (r + dr[d] * s) % n, (c + dc[d] * s) % n
-                    new_grid[nr][nc].append((nr, nc, m, s, d))
-    return new_grid
+    for i in range(len(atom_list)):
+        r, c, m, s, d = atom_list[i]
+        nr, nc = (r + dr[d] * s) % n, (c + dc[d] * s) % n
+        if not grid[nr][nc]:
+            tmp_dir = [0, 0]
+            tmp_dir[d % 2] = 1
+            grid[nr][nc] = [m, s, 1, tmp_dir]   # 질량, 속도, 원소 갯수, 방향
+        else:
+            grid[nr][nc][0] += m
+            grid[nr][nc][1] += s
+            grid[nr][nc][2] += 1
+            grid[nr][nc][3][d % 2] = 1
+
 
 
 def separate_atoms():
-    new_grid = [[deque() * n for _ in range(n)] for _ in range(n)]
-    for i in range(n):
-        for j in range(n):
-            if grid[i][j]:
-                # 원자 질량, 개수, 스피드, 방향 확인
-                atom_cnt = len(grid[i][j])
-                total_m, total_speed = 0, 0
-                get_dir = [0, 0]
-                for k in range(atom_cnt):
-                    r, c, m, s, d = grid[i][j][k]
-                    total_m += m
-                    total_speed += s
-                    get_dir[d % 2] = 1
-                new_m = total_m // 5
-                # 질량이 0인 경우, 소멸
+    new_list = []
+    for r in range(n):
+        for c in range(n):
+            if grid[r][c]:
+                m, s, atom_cnt, tmp_dir = grid[r][c]
+                new_m = m // 5
+                new_s = s // atom_cnt
                 if not new_m:
                     continue
-                if sum(get_dir) == 2:
+                if sum(tmp_dir) == 2:
                     for nd in range(4):
-                        new_grid[i][j].append((r, c, new_m, total_speed // atom_cnt, 2 * nd + 1))
+                        new_list.append((r, c, new_m, new_s, 2 * nd + 1))
                 else:
                     for nd in range(4):
-                        new_grid[i][j].append((r, c, new_m, total_speed // atom_cnt, 2 * nd))
+                        new_grid[i][j].append((r, c, new_m, new_s, 2 * nd))
 
-    return new_grid
+    return new_list
 
 n, m, k = map(int, input().split())
-grid = [[deque() * n for _ in range(n)] for _ in range(n)]
 atom_list = []
 for _ in range(m):
     sx, sy, sm, ss, sd = map(int, input().split())
-    grid[sx - 1][sy - 1].append((sx - 1, sy - 1, sm, ss, sd))
+    atom_list.append((sx - 1, sy - 1, sm, ss, sd))
 
 for _ in range(k):
+    grid = [[0] * n for _ in range(n)]
+
     # 1. 원자 이동
-    grid = move_atoms()
+    move_atoms()
 
     # 2. 원자 분열
-    grid = separate_atoms()
+    atom_list = separate_atoms()
 
-ans = 0
-for i in range(n):
-    for j in range(n):
-        ans += len(grid[i][j])
-
-print(ans)
+print(len(atom_list))
