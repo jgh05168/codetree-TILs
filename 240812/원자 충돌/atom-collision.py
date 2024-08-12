@@ -57,7 +57,7 @@ def separate_atoms():
                         new_list.append((r, c, new_m, new_s, 2 * nd + 1))
                 else:
                     for nd in range(4):
-                        new_grid[i][j].append((r, c, new_m, new_s, 2 * nd))
+                        new_list.append((r, c, new_m, new_s, 2 * nd))
 
     return new_list
 
