@@ -38,7 +38,9 @@ dc = [1, 0, -1, 0]
 def get_bomb_list(sr, sc, color):
     queue = deque([(sr, sc)])
     visited[sr][sc] = 1
-    tmp_bomb_list = [(sr, sc)]
+    tmp_bomb_list = set()
+    tmp_bomb_list.add((sr, sc))
+    red_bombs = set()
     tmp_red_bombs = 0
 
     while queue:
@@ -47,15 +49,19 @@ def get_bomb_list(sr, sc, color):
         for d in range(len(dr)):
             nr, nc = r + dr[d], c + dc[d]
             if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and grid[nr][nc] in [color, 0]:
-                tmp_bomb_list.append((nr, nc))
                 # 같은 색깔인 경우에만 방문 처리
                 if grid[nr][nc] == color:
                     visited[nr][nc] = 1
+                    queue.append((nr, nc))
                 else:
-                    tmp_red_bombs += 1
-                queue.append((nr, nc))
+                    if (nr, nc) not in red_bombs:
+                        tmp_red_bombs += 1
+                        queue.append((nr, nc))
+                        red_bombs.add((nr, nc))
+                tmp_bomb_list.add((nr, nc))
 
-    return tmp_bomb_list, tmp_red_bombs
+
+    return list(tmp_bomb_list), tmp_red_bombs
 
 
 def rotate():
@@ -67,11 +73,10 @@ def rotate():
     return new_grid
 
 
-
 def gravity():
     for j in range(n):
         for i in range(n - 2, -1, -1):
-            if grid[i][j] > 0:
+            if grid[i][j] >= 0:
                 tmp_i = i + 1
                 while tmp_i < n and grid[tmp_i][j] < -1:
                     tmp_i += 1
