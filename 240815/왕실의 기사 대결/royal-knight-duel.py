@@ -115,7 +115,11 @@ for k_idx in knight_dict.keys():
 move_list = []
 for _ in range(Q):
     knight, d = map(int, input().split())
-
+    
+    # 0. 이미 죽은 녀석이면 continue
+    if not knight_hp[knight]:
+        continue
+        
     # 1. 기사와 붙어있는 녀석들 찾기
     move_list = can_move(knight_dict[knight], d, knight)
 
