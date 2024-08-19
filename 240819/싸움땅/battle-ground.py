@@ -106,22 +106,22 @@ def move_players():
             p_stat, np_stat = stat + gun, nstat + ngun
             if p_stat > np_stat:
                 points[player] += (p_stat - np_stat)
-                win_player = p_grid[r][c]
-                lose_player = p_grid[nr][nc]
+                win_player = [player, d, stat, gun]
+                lose_player = [new_player, nd, nstat, ngun]
             elif p_stat < np_stat:
                 points[new_player] += (np_stat - p_stat)
-                win_player = p_grid[nr][nc]
-                lose_player = p_grid[r][c]
+                win_player = [new_player, nd, nstat, ngun]
+                lose_player = [player, d, stat, gun]
             else:
                 # 초기 눙력치 비교
                 if stat > nstat:
                     points[player] += (p_stat - np_stat)
-                    win_player = p_grid[r][c]
-                    lose_player = p_grid[nr][nc]
+                    win_player = [player, d, stat, gun]
+                    lose_player = [new_player, nd, nstat, ngun]
                 else:
                     points[new_player] += (np_stat - p_stat)
-                    win_player = p_grid[nr][nc]
-                    lose_player = p_grid[r][c]
+                    win_player = [new_player, nd, nstat, ngun]
+                    lose_player = [player, d, stat, gun]
             p_grid[r][c], p_grid[nr][nc] = 0, 0
 
             # 2. 총 두고 떠나기
