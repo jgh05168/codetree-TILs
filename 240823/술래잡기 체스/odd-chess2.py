@@ -26,7 +26,7 @@ dr = [-1, -1, 0, 1, 1, 1, 0, -1]
 dc = [0, -1, -1, -1, 0, 1, 1, 1]
 
 
-def thief_move(grid, thief_alive):
+def thief_move(grid, thief_alive, pr, pc):
     for i in range(17):
         if not thief_alive[i]:
             continue
@@ -51,7 +51,7 @@ def thief_move(grid, thief_alive):
 def dfs(move, val, grid, thief_locs, pr, pc, pd):
     global ans
     # 1. 도둑 움직이기
-    new_grid, new_thief_locs = thief_move(grid, thief_locs)
+    new_grid, new_thief_locs = thief_move(grid, thief_locs, pr, pc)
 
     # 2. 술래 움직이기
     while 0 <= pr < 4 and 0 <= pc < 4:
@@ -83,6 +83,6 @@ start = grid[0][0][0]
 grid[0][0] = 0
 
 ans = start
-dfs(0, start, grid, thief_alive, pr, pc, pd)
+dfs(0, start, copy.deepcopy(grid), copy.deepcopy(thief_alive), pr, pc, pd)
 
 print(ans)
