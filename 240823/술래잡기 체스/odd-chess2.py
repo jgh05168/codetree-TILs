@@ -58,7 +58,8 @@ def dfs(move, val, grid, thief_locs, pr, pc, pd):
         nr, nc = pr + dr[pd], pc + dc[pd]
         if not (0 <= nr < 4 and 0 <= nc < 4) or not new_grid[nr][nc]:
             ans = max(ans, val)
-            break
+            pr, pc = nr, nc
+            continue
         v, nd = grid[nr][nc]
         new_grid[nr][nc] = 0
         new_thief_locs[v] = 0
@@ -66,6 +67,7 @@ def dfs(move, val, grid, thief_locs, pr, pc, pd):
         new_grid[nr][nc] = (v, nd)
         new_thief_locs[v] = (nr, nc)
         pr, pc = nr, nc
+
 
 grid = []
 thief_alive = [0] * 17
