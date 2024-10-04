@@ -76,7 +76,7 @@ def golem_move(golem, r, c):      # 골렘 중앙을 인자로 받기
         break
 
     # 만약 골렘이 이동하지 못한다면 이동불가 판정 후 비워주기
-    if r < 3:
+    if r - 1 < 3:
         return True, -1, -1
     # 현재 위치에 대해 골렘 생성하기
     grid[r][c] = golem
@@ -124,7 +124,7 @@ for golem in range(1, k + 1):
 
     # 1. 골렘 이동
     clean_map, r, c = golem_move(golem, 1, c - 1)
-    
+
     # 2-1. 만약 골렘이 이동 불가능한 경우, 맵 비워주기
     if clean_map:
         grid = [[0] * m for _ in range(n)]
