@@ -23,8 +23,6 @@
 '''
 
 from collections import deque, defaultdict
-import sys
-input = sys.stdin.readline
 
 #     북  동  남  서
 dr = [-1, 0, 1, 0]
