@@ -102,11 +102,11 @@ for _ in range(q):
         for sol, r, c in move_loc:
             nr, nc = r + dr[order], c + dc[order]
             soldier_grid[nr][nc] = sol
+            if not check_update[sol]:
+                check_update[sol] = 1
+                soldier_list[sol] = (nr, nc)
             # 밀쳐진 기사들은 현재 위치에 데미지를 입는지 확인해야함
             if sol != soldier:
-                if not check_update[sol]:
-                    check_update[sol] = 1
-                    soldier_list[sol] = (nr, nc)
                 cur_soldiers_loc[sol].append((nr, nc))
 
     # 2. 대결 데미지 입기
