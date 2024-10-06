@@ -99,6 +99,7 @@ def find_treasure():
                             tmp_list.extend(piece_list)
                 if max_tmp < tmp and min_rot > rot:
                     max_tmp = tmp
+                    min_rot = rot
                     max_piece = tmp_list[:]
                     new_grid = [row[:] for row in tmp_grid]
 
