@@ -85,7 +85,7 @@ for i in range(1, m + 1):
 
 for _ in range(q):
     soldier, order = map(int, input().split())
-    check_update = [0] * (q + 1)
+    check_update = [0] * (m + 1)
     # 0. 이미 죽은 기사면, 이어가기
     if not soldier_list[soldier]:
         continue
@@ -96,7 +96,7 @@ for _ in range(q):
     if not move_loc:
         continue
     else:
-        cur_soldiers_loc = [[] * (q + 1) for _ in range(q + 1)]
+        cur_soldiers_loc = [[] * (m + 1) for _ in range(m + 1)]
         for _, r, c in move_loc:
             soldier_grid[r][c] = 0
         for sol, r, c in move_loc:
@@ -128,7 +128,7 @@ for _ in range(q):
                 soldier_list[sol] = 0
 
 ans = 0
-for i in range(1, q + 1):
+for i in range(1, m + 1):
     if soldier_hp[i]:
         ans += damage_sum[i]
 print(ans)
