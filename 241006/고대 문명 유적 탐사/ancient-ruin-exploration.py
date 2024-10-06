@@ -41,7 +41,7 @@ dc = [1, 0, -1, 0]
 visited = []
 
 
-def rotate(si, sj, n):
+def rotate(si, sj, n, grid):
     new_grid = [row[:] for row in grid]
     for i in range(si, n + si):
         for j in range(sj, n + sj):
@@ -80,13 +80,15 @@ def find_treasure():
     max_tmp = 0
     new_grid = [row[:] for row in grid]
     max_piece = []
+    min_rot = 4
     # 회전시키기
-    for _ in range(3):
-        for j in range(n - 2):
-            for i in range(n - 2):
+    for j in range(n - 2):
+        for i in range(n - 2):
+            tmp_grid = [row[:] for row in grid]
+            for rot in range(3):
                 tmp = 0
                 tmp_list = []
-                tmp_grid = rotate(i, j, 3)
+                tmp_grid = rotate(i, j, 3, tmp_grid)
                 # 유물 1차 획득해보기
                 visited = [[0] * n for _ in range(n)]
                 for r in range(n):
@@ -95,7 +97,7 @@ def find_treasure():
                         if piece >= 3:
                             tmp += piece
                             tmp_list.extend(piece_list)
-                if max_tmp < tmp:
+                if max_tmp < tmp and min_rot > rot:
                     max_tmp = tmp
                     max_piece = tmp_list[:]
                     new_grid = [row[:] for row in tmp_grid]
