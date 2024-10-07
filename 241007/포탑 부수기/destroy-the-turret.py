@@ -77,6 +77,8 @@ def laser_attack(r, c, tmp_path):
             path = set(tmp_path)
             laser = 1
         return
+    if len(tmp_path) >= move_cnt:
+        return
     for d in range(4):
         nr, nc = (r + dr[d]) % N, (c + dc[d]) % M
         if not visited[nr][nc] and grid[nr][nc]:
