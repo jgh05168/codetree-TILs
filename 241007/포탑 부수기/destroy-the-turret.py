@@ -92,7 +92,7 @@ def bomb_attack(r, c):
     path.add((r, c))
     for d in range(len(dr)):
         nr, nc = (r + dr[d]) % N, (c + dc[d]) % M
-        if grid[nr][nc]:
+        if grid[nr][nc] and (nr, nc) != (sr, sc):
             path.add((nr, nc))
 
 
