@@ -105,6 +105,9 @@ for i in range(N):
 for _ in range(K):
     # 1. 공격자, 공격받을자 선정
     attacker = heapq.heappop(turret_pq)
+    if not turret_pq:
+        heapq.heappush(turret_pq, attacker)
+        continue
     defender = heapq.nlargest(1, turret_pq)[0]
 
     # 2. 공격자와의 최단거리 찾기
@@ -113,6 +116,7 @@ for _ in range(K):
     visited = [[0] * M for _ in range(N)]
     visited[sr][sc] = 1
     laser = 0
+    path = set()
     move_cnt = N * M
     # 2-1. 레이저 공격
     laser_attack(sr, sc, [])      # 행, 열, 경로
