@@ -111,6 +111,7 @@ for _ in range(K):
     sr, sc = (-attacker[2]) + attacker[3], -attacker[3]
     er, ec = (-defender[2]) + defender[3], -defender[3]
     visited = [[0] * M for _ in range(N)]
+    visited[sr][sc] = 1
     laser = 0
     move_cnt = N * M
     # 2-1. 레이저 공격
