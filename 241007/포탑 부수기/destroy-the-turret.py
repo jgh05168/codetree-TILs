@@ -54,7 +54,7 @@ dfs - 최단경로 찾기 ( 우선순위가 존재하기 떄문 )
     - 이동 경로는 set으로 업데이트하기
 '''
 
-from collections import defaultdict
+from collections import defaultdict, deque
 import heapq
 
 # init()
@@ -67,24 +67,28 @@ move_cnt = 0
 laser = 0
 
 
-def laser_attack(r, c, tmp_path):
+def laser_attack(sr, sc):
     global laser, move_cnt, path
-    # 도착했다면, 레이저 경로 체크하기
-    if (r, c) == (er, ec):
-        tmp_move = len(tmp_path)
-        if tmp_move < move_cnt:
-            move_cnt = tmp_move
-            path = set(tmp_path)
-            laser = 1
-        return
-    if len(tmp_path) >= move_cnt:
-        return
-    for d in range(4):
-        nr, nc = (r + dr[d]) % N, (c + dc[d]) % M
-        if not visited[nr][nc] and grid[nr][nc]:
-            visited[nr][nc] = 1
-            laser_attack(nr, nc, tmp_path + [(nr, nc)])
-            visited[nr][nc] = 0
+    queue = deque()
+    queue.append((sr, sc, []))
+    visited[sr][sc] = 1
+
+    while queue:
+        row, col, p = queue.popleft()
+
+        if (row, col) == (er, ec):
+            return True, p
+
+        for d in range(4):
+            nrow, ncol = (row + dr[d]) % N, (col + dc[d]) % M
+            if not visited[nrow][ncol] and grid[nrow][ncol]:
+                visited[nrow][ncol] = visited[row][col] + 1
+                if (nrow, ncol) == (er, ec):
+                    path = set(p + [(nrow, ncol)])
+                    laser = 1
+                    return
+                queue.append((nrow, ncol, p + [(nrow, ncol)]))
+
 
 
 def bomb_attack(r, c):
@@ -116,12 +120,11 @@ for _ in range(K):
     sr, sc = (-attacker[2]) + attacker[3], -attacker[3]
     er, ec = (-defender[2]) + defender[3], -defender[3]
     visited = [[0] * M for _ in range(N)]
-    visited[sr][sc] = 1
     laser = 0
     path = set()
     move_cnt = N * M
     # 2-1. 레이저 공격
-    laser_attack(sr, sc, [])      # 행, 열, 경로
+    laser_attack(sr, sc)      # 행, 열, 경로
 
     # 2-2. 포탄 공격(레이저 공격 실패 시)
     if not laser:
