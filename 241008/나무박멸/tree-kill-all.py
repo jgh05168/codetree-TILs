@@ -73,8 +73,6 @@ def kill_tree(r, c, test=1):
                     grid[nr][nc] = 0
                 # 만약 나무가 없거나 벽이거나, 제초제가 뿌려진 칸이였다면, 종료
                 else:
-                    if dead[nr][nc]:
-                        break
                     if grid[nr][nc] <= 0:
                         kill_tree -= grid[nr][nc]
                         break
