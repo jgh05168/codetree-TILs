@@ -87,23 +87,32 @@ def find_basecamp(store, person):
     sr, sc = store
     queue = deque()
     queue.append((sr, sc))
-    visited = [[0] * n for _ in range(n)]
-    visited[sr][sc] = 1
+    visited = [[-1] * n for _ in range(n)]
+    visited[sr][sc] = 0
+    basecamp_list = []
 
+    min_dist = n * n
     while queue:
         r, c = queue.popleft()
 
         for d in range(len(dr)):
             nr, nc = r + dr[d], c + dc[d]
-            if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and (nr, nc) not in basecamp_set and grid[nr][nc] != -1:
+            if 0 <= nr < n and 0 <= nc < n and visited[nr][nc] == -1 and (nr, nc) not in basecamp_set and grid[nr][nc] != -1:
                 if basecamp[nr][nc]:
-                    people.append((nr, nc))
-                    basecamp_set.add((nr, nc))
-                    grid[nr][nc] = -1
-                    return
+                    if visited[r][c] + 1 < min_dist:
+                        basecamp_list = [(nr, nc)]
+                        min_dist = visited[r][c] + 1
+                    elif visited[r][c] + 1 == min_dist:
+                        basecamp_list.append((nr, nc))
                 else:
                     queue.append((nr, nc))
-                    visited[nr][nc] = 1
+                visited[nr][nc] = visited[r][c] + 1
+
+    basecamp_list.sort()
+    nr, nc = basecamp_list[0]
+    people.append((nr, nc))
+    basecamp_set.add((nr, nc))
+    grid[nr][nc] = -1
 
 
 n, m = map(int, input().split())
