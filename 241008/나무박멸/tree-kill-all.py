@@ -106,7 +106,8 @@ for _ in range(m):
                     kr, kc = i, j
 
     # 4. 가장 많이 죽는 곳에 제초제 뿌리기
-    ans += kill_tree(kr, kc, 0)
+    if (kr, kc) != (-1, -1):
+        ans += kill_tree(kr, kc, 0)
 
     # 5. 제초제 년수 줄이기
     for i in range(n):
