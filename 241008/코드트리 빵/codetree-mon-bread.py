@@ -31,11 +31,31 @@ dc = [0, -1, 1, 0]
 
 store_loc = defaultdict(tuple)
 people = [0]
+bef_people = []
 arrived_person = 0
 time = 0
 basecamp_set = set()
 
 
+def move_bfs(sr, sc, er, ec):
+    if (sr, sc) == (er, ec):
+        return 0
+    queue = deque()
+    queue.append((sr, sc))
+    visited = [[-1] * n for _ in range(n)]
+    visited[sr][sc] = 0
+
+    while queue:
+        r, c = queue.popleft()
+        for d in range(len(dr)):
+            nr, nc = r + dr[d], c + dc[d]
+            if 0 <= nr < n and 0 <= nc < n and visited[nr][nc] == -1 and grid[nr][nc] != -1:
+                if (nr, nc) == (er, ec):
+                    return visited[r][c] + 1
+                queue.append((nr, nc))
+                visited[nr][nc] = visited[r][c] + 1
+
+    return -1
 
 def move_person():
     global arrived_person
@@ -47,13 +67,12 @@ def move_person():
         pr, pc = people[p]
         new_r, new_c = pr, pc
         sr, sc = store_loc[p]
-        # 네 방향으로 최단거리 찾기
         dest = n * n
         for d in range(len(dr)):
             nr, nc = pr + dr[d], pc + dc[d]
             if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] != -1:
-                tmp_dest = abs(sr - nr) + abs(sc - nc)
-                if tmp_dest < dest:
+                tmp_dest = move_bfs(nr, nc, sr, sc)
+                if tmp_dest != -1 and dest > tmp_dest:
                     dest = tmp_dest
                     new_r, new_c = nr, nc
         # 2. 목적지에 도착한 경우, 해당 편의점 이동불가로 설정하기 위해 도착한 애들 넘겨주기
@@ -80,6 +99,7 @@ def find_basecamp(store, person):
                 if basecamp[nr][nc]:
                     people.append((nr, nc))
                     basecamp_set.add((nr, nc))
+                    grid[nr][nc] = -1
                     return
                 else:
                     queue.append((nr, nc))
