@@ -148,7 +148,7 @@ for game in range(k):
                 team[team_num].reverse()
                 break
     elif 2 * n <= direction < 3 * n:
-        r = n - direction % n
+        r = n - 1 - direction % n
         for c in range(n - 1, -1, -1):
             if 0 < grid[r][c] < 4:
                 team_num = team_info[r][c]
@@ -156,7 +156,7 @@ for game in range(k):
                 team[team_num].reverse()
                 break
     else:
-        c = n - direction % n
+        c = n - 1 - direction % n
         for r in range(n):
             if 0 < grid[r][c] < 4:
                 team_num = team_info[r][c]
