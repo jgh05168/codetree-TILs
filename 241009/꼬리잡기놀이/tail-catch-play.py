@@ -1,176 +1,173 @@
 '''
-22:47
-
 n x n
-3명 이상이 한 팀
-맨 앞 사람을 머리사람, 맨 뒤 사람을 꼬리사람
-각 팀은 게임에서 주어진 이동 선을 따라서만 이동한다
-
-1. 각 팀은 머리사람을 따라서 한 칸 이동한다.
-2. 각 라운드마다 공이 정해진 선을 따라 던져진다
-    - 0 ~ n : 열 정방향
-    - n ~ 2n : 행 역방향
-    - 2n ~ 3n : 열 역방향
-    - 3n ~ 4n : 행 정방향
-3. 공이 던져지는 경우, 해당 선에 사람이 있으면, 최초에 만나게 되는 사람만이 공을 얻어 점수를 얻게된다.
-    - k번째 사람이라면, k의 제곱만큼 점수를 얻는다.
-    - 공에 맞는 경우 팀의 이동 방향을 바꾼다.
+3명 이상이 한 팀이 된다.
+모든 사람들은 자신의 앞 사람을 따라 움직인다 (path 배열)
+1. 머리 사람을 따라 한 칸 이동한다.
+2. 공이 정해진 선을 따라 던져진다.
+    - 4n 동안 우 상 좌 하 방향으로, 던져진다.
+    - 시작점은 0, 0, n-1, n-1 순
+    - 4n이 넘어가면 다시 반복한다.
+3. 최초에 만나게 되는 사람만이 공을 얻게 되어 점수를 얻는다.
+    - 해당 사람이 머리 사람을 시작으로 k번째 사람이라면(idx num), k의 제곱만큼 점수를 얻는다.
+    - 공을 획득한 팀의 경우, 머리사람과 꼬리 사람이 바뀐다.(방향 반대)
 
 풀이:
-1. 각 팀 별 꼬리 리스트를 생성해야 한다.
-    - 팀 별 bfs 진행하여 다음 위치 따라가기
-    - 1번의 다음 좌표만 안 다음, 나머지는 그대로 이어주기
-    - 이후, 맵 업데이트
-2. 점수내기
+1. init()에서 bfs 사용하여 각 팀의 이동 동선을 알아낸다.
+    - 원형 deck 사용
+    - 방향 바뀔 때마다 pop하여 진행
+    - path 정보를 저장
+    - 몇 명 존재하는지도 카운트하기
+2. 게임 할 때마다 path의 마지막 지점을 pop 한 다음 appendleft 한다.
+3. 숫자 세주기
+
 '''
 
 from collections import deque
 
+
 dr = [0, 1, 0, -1]
 dc = [1, 0, -1, 0]
 
-team = []
-ans = 0
-
-def make_team(sr, sc, member=1):
+def bfs(sr, sc, team_num):
     queue = deque()
-    if member:
-        tmp_team = [(sr, sc)]
-        team_info[sr][sc] = team_num
-    visited = [[0] * n for _ in range(n)]
+    visited[sr][sc] = team_num
     queue.append((sr, sc))
-    visited[sr][sc] = 1
+    team_path = deque([(sr, sc)])
+    member_cnt = 1
+    next_queue = deque([(sr, sc)])
 
     while queue:
         r, c = queue.popleft()
-
         for d in range(len(dr)):
             nr, nc = r + dr[d], c + dc[d]
-            if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and 0 < grid[nr][nc] <= 4:
-                if not member:
+            if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and grid[nr][nc]:
+                if grid[nr][nc] + 1 == grid[r][c] or grid[nr][nc] == 2:
+                    team_path.appendleft((nr, nc))
+                    member_cnt += 1
+                    visited[nr][nc] = team_num
                     queue.append((nr, nc))
-                    visited[nr][nc] = 1
-                    team_info[nr][nc] = team_num
-                else:
-                    if grid[nr][nc] < 4:
-                        # 바로 꼬리가 들어가는 상황 방지
-                        if abs(grid[r][c] - grid[nr][nc]) < 2:
-                            tmp_team.append((nr, nc))
-                            queue.append((nr, nc))
-                            visited[nr][nc] = 1
-    if member:
-        team.append(tmp_team)
-
-
-def next_move(t, r, c):
-    new_move = []
-    for d in range(len(dr)):
-        nr, nc = r + dr[d], c + dc[d]
-        if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] >= 3:
-            new_move.append((nr, nc))
-            break
-    for idx in range(len(team[t]) - 1):
-        r, c = team[t][idx]
-        new_move.append((r, c))
-
-    r, c = team[t][-1][0], team[t][-1][1]
-    if (new_move[0][0], new_move[0][1]) == (r, c):
-        last_value[t] = 3
-    else:
-        last_value[t] = 4
-    team[t] = new_move
-
-
-def make_new_grid():
-    new_grid = [row[:] for row in grid]
-    for t in range(m):
-        new_grid[team[t][0][0]][team[t][0][1]] = 1
-        for idx in range(1, len(team[t]) - 1):
-            r, c = team[t][idx]
-            new_grid[r][c] = 2
-        r, c = team[t][-1][0], team[t][-1][1]
-        new_grid[r][c] = 3
+    # path 구해주기
+    while next_queue:
+        r, c = next_queue.popleft()
         for d in range(len(dr)):
             nr, nc = r + dr[d], c + dc[d]
-            if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 3 and (nr, nc) != team[t][0]:
-                new_grid[nr][nc] = last_value[t]
+            if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and grid[nr][nc] == 4:
+                team_path.append((nr, nc))
+                next_queue.append((nr, nc))
+                visited[nr][nc] = team_num
                 break
 
-    return new_grid
+    return team_path, member_cnt
+
+def init():
+    team_num = 1
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == 3:
+                teams.append(bfs(i, j, team_num))
+                team_num += 1
 
 
-def get_score(r, c, t):
-    for i in range(1, len(team[t]) + 1):
-        loc = team[t][i - 1]
-        if (r, c) == loc:
-            return i * i
+def move_runner():
+    for team_idx in range(m):
+        team, members = teams[team_idx]
+        er, ec = team.pop()
+        tmp_val = grid[er][ec]
+        team.appendleft((er, ec))
+        for idx in range(1, members + 1):
+            try:
+                grid[team[idx - 1][0]][team[idx - 1][1]] = grid[team[idx][0]][team[idx][1]]
+            except:
+                idx += 1
+                break
+        if idx > members:
+            grid[team[-1][0]][team[-1][1]] = tmp_val
+        else:
+            grid[team[idx][0]][team[idx][1]] = tmp_val
+
+def change_move(team_idx):
+    team, members = teams[team_idx]
+    tmp_list = deque()
+    # 술래 위치 reverse
+    grid[team[members - 1][0]][team[members - 1][1]] = 1
+    tmp_list.append(team[members - 1])
+    for idx in range(members - 2, 0, -1):
+        tmp_list.append(team[idx])
+        grid[team[idx][0]][team[idx][1]] = 2
+    grid[team[0][0]][team[0][1]] = 3
+    tmp_list.append(team[0])
+    # path 위치 reverse
+    for idx in range(len(team) - 1, members - 1, -1):
+        tmp_list.append(team[idx])
+    teams[team_idx] = (tmp_list, members)
+
+def catch_runner(game_dir, ball_idx):
+    global ans
+    if not game_dir:
+        for c in range(n):
+            if 0 < grid[ball_idx][c] < 4:
+                # 점수 내기
+                for i in range(teams[visited[ball_idx][c] - 1][1]):
+                    if (ball_idx, c) == teams[visited[ball_idx][c] - 1][0][i]:
+                        ans += ((i + 1) ** 2)
+                        break
+                # 3. 술래 방향 바꾸기
+                change_move(visited[ball_idx][c] - 1)
+                break
+    elif game_dir == 1:
+        for r in range(n - 1, -1, -1):
+            if 0 < grid[r][ball_idx] < 4:
+                # 점수 내기
+                for i in range(teams[visited[r][ball_idx] - 1][1]):
+                    if (r, ball_idx) == teams[visited[r][ball_idx] - 1][0][i]:
+                        ans += ((i + 1) ** 2)
+                        break
+                # 3. 술래 방향 바꾸기
+                change_move(visited[r][ball_idx] - 1)
+                break
+    elif game_dir == 2:
+        for c in range(n - 1, -1, -1):
+            if 0 < grid[n - ball_idx - 1][c] < 4:
+                # 점수 내기
+                for i in range(teams[visited[n - ball_idx - 1][c] - 1][1]):
+                    if (n - ball_idx - 1, c) == teams[visited[n - ball_idx - 1][c] - 1][0][i]:
+                        ans += ((i + 1) ** 2)
+                        break
+                # 3. 술래 방향 바꾸기
+                change_move(visited[n - ball_idx - 1][c] - 1)
+                break
+    else:
+        for r in range(n):
+            if 0 < grid[r][n - ball_idx - 1] < 4:
+                # 점수 내기
+                for i in range(teams[visited[r][n - ball_idx - 1] - 1][1]):
+                    if (r, n - ball_idx - 1) == teams[visited[r][n - ball_idx - 1] - 1][0][i]:
+                        ans += ((i + 1) ** 2)
+                        break
+                # 3. 술래 방향 바꾸기
+                change_move(visited[r][n - ball_idx - 1] - 1)
+                break
+
 
 
 n, m, k = map(int, input().split())
 grid = [list(map(int, input().split())) for _ in range(n)]
-team_info = [[-1] * n for _ in range(n)]
-last_value = [3] * m
+visited = [[0] * n for _ in range(n)]
 
-# 0. 팀 찾기, 팀만들기
-team_num = 0
-for i in range(n):
-    for j in range(n):
-        if grid[i][j] == 1:
-            make_team(i, j)
-            make_team(i, j, 0)
-            team_num += 1
+teams = []
+init()
 
-for game in range(k):
-    # 1-1. 모든 팀 별 이동할 위치 찾기
-    for t in range(m):
-        next_move(t, team[t][0][0], team[t][0][1])
+ans = 0
+game_dir = -1
+for round in range(k):
+    # 0. 4n 맞춰주기
+    if not round % n:
+        game_dir = (game_dir + 1) % 4
 
-    # 1-2. 팀 그리드 업데이트
-    grid = make_new_grid()
+    # 1. 술래 이동
+    move_runner()
 
-    # 2. 공 던지기
-    direction = game % (4 * n)
-    team_num = -1
-    if 0 <= direction < n:
-        r = direction % n
-        for c in range(n):
-            if 0 < grid[r][c] < 4:
-                team_num = team_info[r][c]
-                ans += get_score(r, c, team_num)
-                team[team_num].reverse()
-                break
-    elif n <= direction < 2 * n:
-        c = direction % n
-        for r in range(n - 1, -1, -1):
-            if 0 < grid[r][c] < 4:
-                team_num = team_info[r][c]
-                ans += get_score(r, c, team_num)
-                team[team_num].reverse()
-                break
-    elif 2 * n <= direction < 3 * n:
-        r = n - 1 - direction % n
-        for c in range(n - 1, -1, -1):
-            if 0 < grid[r][c] < 4:
-                team_num = team_info[r][c]
-                ans += get_score(r, c, team_num)
-                team[team_num].reverse()
-                break
-    else:
-        c = n - 1 - direction % n
-        for r in range(n):
-            if 0 < grid[r][c] < 4:
-                team_num = team_info[r][c]
-                ans += get_score(r, c, team_num)
-                team[team_num].reverse()
-                break
-
-    # 만약 맞췄다면, 뒤집힌 그리드로 새로 업데이트
-    if team_num != -1:
-        grid[team[team_num][0][0]][team[team_num][0][1]] = 1
-        for idx in range(1, len(team[team_num]) - 1):
-            r, c = team[team_num][idx]
-            grid[r][c] = 2
-        grid[team[team_num][-1][0]][team[team_num][-1][1]] = 3
-
+    # 2. 게임 시작
+    catch_runner(game_dir, round % n)
 
 print(ans)
