@@ -116,7 +116,7 @@ for game in range(k):
     # 2. 공 던지기
     direction = game % (4 * n)
     team_num = -1
-    if 0 <= direction <= n:
+    if 0 <= direction < n:
         r = direction % n
         for c in range(n):
             if 0 < grid[r][c] < 4:
@@ -124,18 +124,18 @@ for game in range(k):
                 ans += get_score(r, c, team_num)
                 team[team_num].reverse()
                 break
-    elif n + 1 <= direction <= 2 * n:
+    elif n <= direction < 2 * n:
         c = direction % n
         for r in range(n - 1, -1, -1):
-            if grid[r][c] > 0:
+            if 0 < grid[r][c] < 4:
                 team_num = team_info[r][c]
                 ans += get_score(r, c, team_num)
                 team[team_num].reverse()
                 break
-    elif 2 * n + 1 <= direction <= 3 * n:
+    elif 2 * n <= direction < 3 * n:
         r = n - direction % n
         for c in range(n - 1, -1, -1):
-            if grid[r][c] > 0:
+            if 0 < grid[r][c] < 4:
                 team_num = team_info[r][c]
                 ans += get_score(r, c, team_num)
                 team[team_num].reverse()
@@ -143,12 +143,12 @@ for game in range(k):
     else:
         c = n - direction % n
         for r in range(n):
-            if grid[r][c] > 0:
+            if 0 < grid[r][c] < 4:
                 team_num = team_info[r][c]
                 ans += get_score(r, c, team_num)
                 team[team_num].reverse()
                 break
-    
+
     # 만약 맞췄다면, 뒤집힌 그리드로 새로 업데이트
     if team_num != -1:
         grid[team[team_num][0][0]][team[team_num][0][1]] = 1
