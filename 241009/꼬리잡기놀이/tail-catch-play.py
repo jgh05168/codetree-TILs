@@ -54,7 +54,7 @@ def make_team(sr, sc, member=1):
                 else:
                     if grid[nr][nc] < 4:
                         # 바로 꼬리가 들어가는 상황 방지
-                        if abs(grid[tmp_team[-1][0]][tmp_team[-1][1]] - grid[nr][nc]) < 2:
+                        if abs(grid[r][c] - grid[nr][nc]) < 2:
                             tmp_team.append((nr, nc))
                             queue.append((nr, nc))
                             visited[nr][nc] = 1
