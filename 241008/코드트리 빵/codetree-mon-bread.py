@@ -76,7 +76,7 @@ def find_basecamp(store, person):
 
         for d in range(len(dr)):
             nr, nc = r + dr[d], c + dc[d]
-            if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and (nr, nc) not in basecamp_set:
+            if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc] and (nr, nc) not in basecamp_set and grid[nr][nc] != -1:
                 if basecamp[nr][nc]:
                     people.append((nr, nc))
                     basecamp_set.add((nr, nc))
