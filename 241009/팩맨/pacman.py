@@ -1,120 +1,141 @@
 '''
-15:20
+4 x 4, 몬스터는 8방향 이동 가능
 
-4 x 4 상하좌우대각선
-
-1. 몬스터 복제 시도 : 현재 위치에서 자신과 같은 방향을 가진 몬스터 복제
-    - 부화된 몬스터는 움직이지 못함
+1. 몬스터 복제 시도 : 현재 위치 에서 자신과 같은 방향을 가진 몬스터를 복제
+    - 복제된 몬스터는 이동 불가
 2. 몬스터 이동 : 현재 자신이 가진 방향대로 한 칸 이동
-    - 움직이려는 칸에 몬스터 시체가 있거나, 팩맨이 있는 경우, 격자를 벗어나는 경우, 반시계 방향으로 45도 회전 후 판단
-    - 8방향 다 봤는데도 움직일 수 없다면 움직이지 않는다.
-    - 몬스터는 한번에 같이 이동한다
-3. 팩맨 이동 : 총 세 칸을 이동한다.
-    - 상좌하우 총 세 칸씩 이동 가능하다.
-    - 격자 밖을 나가는 경우는 고려 x
-    - 팩맨의 알은 먹지 않으며, 움직이기 전에 함께 있던 몬스터도 먹지 않는다.
-4. 몬스터 시체 소멸 : 몬스터의 시체는 2턴동안 유지.
-5. 몬스터 복제 완성 : 알 형태였던 몬스터 부화. (현재 그리드에 append)해주기
+    - 몬스터 시체가 있거나, 팩맨이 있거나, 격자를 벗어나는 경우
+        - 이동이 가능할 때 까지 반시계 방향으로 45도 회전
+        - 8방향 다 돌았는데도 못움직이면, 움직이지 않는다.
+3. 팩맨 이동 : 상하좌우 합쳐서 3칸 이동한다. ( dfs)
+    - 몬스터를 가장 많이 먹을 수 있는 방향으로 이동한다.
+    - 상좌하우 의 우선순위를 갖는다.
+        - 우선순위 맞게 dfs 돌리기
+    - 알을 먹지 않으며, 움직이기 전에 함꼐 있던 몬스터도 먹지 않는다.
+4. 몬스터 시체
+    - 2턴동안 유지.
+5. 몬스터 복제 완성 : 알 형태였던 몬스터가 부화한다.
 
-필요 grid : 몬스터
-알은 1차원 배열로 지정하여 업데이트해주기
-팩맨은 dfs로 이동시키며 최적의 루트 찾기 ( 전역변수로 설정해주기 )
+풀이 :
+만들어야 할 1차원 배열 : 몬스터, 몬스터 알,
+2차원 배열 : 팩맨, 몬스터 시체
+순서 :
+몬스터 알 낳기 ( 배열에 저장 ) -> 몬스터 이동 push and pop, 그리드에 위치 업데이트 -> 팩맨 이동 ( dfs )
+    -> 몬스터 시체  처리 -> 알 복제 완성 ( 그리드에 업데이트 )
 
+어차피 grid 4 x 4니까, grid 안에서 처리하는 것도 방법임
 '''
 
-#     상     좌     하    우
-dr = [-1, -1, 0, 1, 1, 1, 0, -1]
-dc = [0, -1, -1, -1, 0, 1, 1, 1]
+from collections import deque
 
-n = 4
-grid = [[[] * n for _ in range(n)] for _ in range(n)]
-egg_list = []
-packman_move = []
-packman = tuple()
-dead = [[0] * n for _ in range(n)]
-monster_list = []
+mon_dr = [-1, -1, 0, 1, 1, 1, 0, -1]
+mon_dc = [0, -1, -1, -1, 0, 1, 1, 1]
+pack_dr = [-1, 0, 1, 0]
+pack_dc = [0, -1, 0, 1]
 
 
-def get_eggs():
-    global monster_list, egg_list
+def lay_eggs():
     for i in range(n):
         for j in range(n):
             if grid[i][j]:
                 for d in grid[i][j]:
-                    egg_list.append((i, j, d))
-                    monster_list.append((i, j, d))
+                    monster_eggs[i][j].append(d)
 
 
-def monster_move():
-    new_grid = [[[] * n for _ in range(n)] for _ in range(n)]
-    for r, c, d in monster_list:
-        for turn in range(len(dr)):
-            nd = (d + turn) % 8
-            nr, nc = r + dr[nd], c + dc[nd]
-            if 0 <= nr < n and 0 <= nc < n and (nr, nc) != packman and not dead[nr][nc]:
-                new_grid[nr][nc].append(nd)
-                break
-        else:
-            new_grid[r][c].append(d)
+def mon_move():
+    new_grid = [[deque() * n for _ in range(n)] for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j]:
+                while grid[i][j]:
+                    d = grid[i][j].popleft()
+                    for _ in range(8):
+                        ni, nj = i + mon_dr[d], j + mon_dc[d]
+                        # 몬스터 시체가 있거나, 팩맨이 있거나, 격자를 벗어나는 경우 : 방향 틀기
+                        if 0 <= ni < n and 0 <= nj < n and (ni, nj) != (pack_r, pack_c) and not dead_monster[ni][nj]:
+                            new_grid[ni][nj].append(d)
+                            break
+                        else:
+                            d = (d + 1) % 8
+                    # 갈 곳이 없는 경우, 가만히 있기
+                    else:
+                        new_grid[i][j].append(d)
+
     return new_grid
 
 
-def dfs(depth, r, c, catch, visited_loc):
-    global max_catch, packman_move, packman
-    if depth == 3:
-        if max_catch < catch:
-            packman_move = visited_loc[:]
-            max_catch = catch
-            packman = (r, c)
-        return
-    for d in range(0, len(dr), 2):
-        nr, nc = r + dr[d], c + dc[d]
-        if 0 <= nr < n and 0 <= nc < n:
-            if (nr, nc) in visited_loc:
-                dfs(depth + 1, nr, nc, catch, visited_loc + [(nr, nc)])
-            else:
-                dfs(depth + 1, nr, nc, catch + len(grid[nr][nc]), visited_loc + [(nr, nc)])
+def pack_move(move_cnt, get_mon, r, c, mon_locs):
+    global eaten_mon_cnt, eaten_mon_list, pack_r, pack_c
+    if move_cnt == 3:
+        if eaten_mon_cnt < get_mon:
+            eaten_mon_cnt = get_mon
+            eaten_mon_list = mon_locs
+            pack_r, pack_c = eaten_mon_list[-1]
+    else:
+        for d in range(4):
+            nr, nc = r + pack_dr[d], c + pack_dc[d]
+            # 격자 밖으로만 안나가게 설정
+            if 0 <= nr < n and 0 <= nc < n:
+                if (nr, nc) in mon_locs:
+                    new_get_mon = get_mon
+                else:
+                    new_get_mon = get_mon + len(grid[nr][nc])
+                pack_move(move_cnt + 1, new_get_mon, nr, nc, mon_locs + [(nr, nc)])
+
+def goodbye_mon():
+    for i in range(n):
+        for j in range(n):
+            if dead_monster[i][j] > 0:
+                dead_monster[i][j] -= 1
+    for r, c in eaten_mon_list:
+        if grid[r][c]:
+            dead_monster[r][c] = 2
+            grid[r][c] = deque()
 
 
+def baby_mon():
+    for i in range(n):
+        for j in range(n):
+            if monster_eggs[i][j]:
+                while monster_eggs[i][j]:
+                    grid[i][j].append(monster_eggs[i][j].popleft())
 
 
+n = 4
 m, t = map(int, input().split())
-ir, ic = map(int, input().split())
-packman = (ir - 1, ic - 1)
-for _ in range(m):
-    ir, ic, id = map(int, input().split())
-    grid[ir - 1][ic - 1].append(id - 1)
+pack_r, pack_c = map(int, input().split())
+pack_r -= 1
+pack_c -= 1
+grid = [[deque() * n for _ in range(n)] for _ in range(n)]              # 팩맨 : -1 | 몬스터 : 1
+monster_eggs = [[deque() * n for _ in range(n)] for _ in range(n)]
+dead_monster = [[0] * n for _ in range(n)]
+for mon_num in range(1, m + 1):
+    sr, sc, sd = map(int, input().split())
+    grid[sr - 1][sc - 1].append(sd - 1)
+
 
 for _ in range(t):
-
-    # 1. 알낳기
-    monster_list = []
-    egg_list = []
-    get_eggs()
+    # 1. 몬스터 알 낳기
+    lay_eggs()
 
     # 2. 몬스터 이동
-    grid = monster_move()
+    grid = mon_move()
 
-    # 3. 팩맨 이동
-    max_catch = -1
-    dfs(0, packman[0], packman[1], 0, [])       # depth, catch, visited
+    # 3. 팩맨 출발
+    eaten_mon_cnt = -1
+    eaten_mon_list = []
+    # visited = [[0] * n for _ in range(n)]
+    # visited[pack_r][pack_c] = 1
+    pack_move(0, 0, pack_r, pack_c, [])
 
-    # 4. 몬스터 죽이기
-    for r, c in packman_move:
-        if grid[r][c]:
-            grid[r][c] = []
-            dead[r][c] = 2 + 1
+    # 4. 몬스터 시체 처리
+    goodbye_mon()
 
-    # 5. 몬스터 시체 소멸
-    for r in range(n):
-        for c in range(n):
-            if dead[r][c]:
-                dead[r][c] -= 1
+    # 5. 알 태어나기
+    baby_mon()
 
-    # 6. 알 깨어나기
-    for r, c, d in egg_list:
-        grid[r][c].append(d)
 
+# 살아남은 몬스터 수 cnt
 ans = 0
 for i in range(n):
     for j in range(n):
