@@ -32,11 +32,11 @@ egg_list = []
 packman_move = []
 packman = tuple()
 dead = [[0] * n for _ in range(n)]
-visited = []
 monster_list = []
 
 
 def get_eggs():
+    global monster_list, egg_list
     for i in range(n):
         for j in range(n):
             if grid[i][j]:
@@ -69,10 +69,12 @@ def dfs(depth, r, c, catch, visited_loc):
         return
     for d in range(0, len(dr), 2):
         nr, nc = r + dr[d], c + dc[d]
-        if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc]:
-            visited[nr][nc] = 1
-            dfs(depth + 1, nr, nc, catch + len(grid[nr][nc]), visited_loc + [(nr, nc)])
-            visited[nr][nc] = 0
+        if 0 <= nr < n and 0 <= nc < n:
+            if (nr, nc) in visited_loc:
+                dfs(depth + 1, nr, nc, catch, visited_loc + [(nr, nc)])
+            else:
+                dfs(depth + 1, nr, nc, catch + len(grid[nr][nc]), visited_loc + [(nr, nc)])
+
 
 
 
@@ -94,8 +96,7 @@ for _ in range(t):
     grid = monster_move()
 
     # 3. 팩맨 이동
-    max_catch = 0
-    visited = [[0] * n for _ in range(n)]
+    max_catch = -1
     dfs(0, packman[0], packman[1], 0, [])       # depth, catch, visited
 
     # 4. 몬스터 죽이기
