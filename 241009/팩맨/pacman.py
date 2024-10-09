@@ -102,7 +102,7 @@ for _ in range(t):
     for r, c in packman_move:
         if grid[r][c]:
             grid[r][c] = []
-            dead[r][c] = 2
+            dead[r][c] = 2 + 1
 
     # 5. 몬스터 시체 소멸
     for r in range(n):
