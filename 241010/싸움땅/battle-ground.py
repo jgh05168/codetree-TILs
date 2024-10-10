@@ -101,6 +101,7 @@ def lose_move(p):
     # 총 내려놓기
     if player_stats[p][1]:
         heapq.heappush(guns[r][c], -player_stats[p][1])
+        player_stats[p][1] = 0
     # 해당 방향으로 한 칸 이동
     for t in range(len(dr)):
         nd = (d + t) % 4
