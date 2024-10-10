@@ -1,117 +1,135 @@
 '''
-14:53
+n x n
 
-n x n 1 ~ 10 숫잘 표현
+상하좌우로 같은 숫자라면 동일한 그룹
+1. 예술 점수 : 모든 그룹 싸으이 조화로움의 합
+    - (그룹 a 칸 수 + 그룹 b 칸 수) x 그룹 a 숫자 x 그룹 b 숫자 x 맞닿아있는 변의 수(딕셔너리)
+조합으로 모든 조화로움 값을 더하자 = 초기 예술 점수
+2. 그림에 대한 회전 진행
+    - 십자 모양 : 반시계 방향으로 회전
+    - 나머지 부분 : 개별적으로 시계 방향으로 회전
 
-1. 그룹 찾기 : 동일한 숫자가 상하좌우로 인접해야 함
-2. 예술 점수 매기기 : 모든 그룹 쌍의 조화로움의 합
-    - 2개의 그룹을 뽑은 뒤 조화로움 계산하기
-    - 맞닿아있는 변이 있는 애들로만 진행
-    점수 산정 : (a 칸수 + b 칸수) x a 숫자 x b 숫자 x 맞닿아있는 변의 수
-3. 회전 진행
-    - 십자 모양의 경우 반시계 90도
-    - 십자 제외한 나머지 정사각형은 90도 시계방향
-총 3회전 이후 예술 점수 총합 구하기
+위를 3번 진행했을 때 예술 점수의 합을 구하자
 
-group(visited)
-현재 그룹과 맞닿아있는 그룹 set
+풀이:
+1. bfs 사용하여 각 그룹 나누기
+2. 그룹 별로 dict 사용하여 인접한 부분 체크
+3. 조합 사용하여 모든 점수 구하기
+4. 회전 진행
 '''
 
+from collections import defaultdict
 from collections import deque
+
 
 dr = [0, 1, 0, -1]
 dc = [1, 0, -1, 0]
 
-ans = 0
-visited = []
-adj_group = []
-
-def bfs(sr, sc, group_num, num):
-    global adj_group
+def bfs(group, sr, sc, number):
     queue = deque([(sr, sc)])
-    visited[sr][sc] = group_num
-    cnt = 1
+    visited[sr][sc] = group
+    tmp_border = []
+    group_cnt = 1
 
     while queue:
         r, c = queue.popleft()
+
         for d in range(len(dr)):
             nr, nc = r + dr[d], c + dc[d]
             if 0 <= nr < n and 0 <= nc < n:
-                if not visited[nr][nc] and grid[nr][nc] == num:
-                    visited[nr][nc] = group_num
+                # 만약 경계면이라면,
+                if grid[nr][nc] != number:
+                    tmp_border.append((nr, nc))
+                if visited[nr][nc] == -1 and grid[nr][nc] == number:
                     queue.append((nr, nc))
-                    cnt += 1
-                elif 0 < visited[nr][nc] < group_num:
-                    adj_group[visited[nr][nc]].add(group_num)
-                    try:
-                        adj_space[visited[nr][nc]][group_num] += 1
-                    except:
-                        while len(adj_space[visited[nr][nc]]) < group_num:
-                            adj_space[visited[nr][nc]].append(0)
-                        adj_space[visited[nr][nc]].append(1)
-    return cnt
+                    visited[nr][nc] = group
+                    group_cnt += 1
+
+    return tmp_border, group_cnt
 
 
-def get_value(group):
-    tmp = 0
-    r, c = group_info[group][0], group_info[group][1]
-    for another in adj_group[group]:
-        nr, nc = group_info[another][0], group_info[another][1]
-        tmp += (group_info[group][2] + group_info[another][2]) * grid[r][c] * grid[nr][nc] * adj_space[group][another]
-    return tmp
+def check_border():
+    for i in range(len(all_group_borders)):
+        border_dict[i] = [0] * group_num
+        for j in range(len(all_group_borders[i])):
+            br, bc = all_group_borders[i][j]
+            border_dict[i][visited[br][bc]] += 1
+
+
+def get_value(cnt, idx, adj_num):
+    global tmp_ans
+    if cnt == 2:
+        a, b = adj_num[0], adj_num[1]
+        # (그룹 a 칸 수 + 그룹 b 칸 수) x 그룹 a 숫자 x 그룹 b 숫자 x 맞닿아있는 변의 수
+        tmp_ans += (group_cnts[a] + group_cnts[b]) * group_values[a] * group_values[b] * border_dict[a][b]
+    else:
+        for i in range(idx + 1, group_num):
+            if idx >= 0 and not border_dict[idx][i]:
+                continue
+            get_value(cnt + 1, i, adj_num + [i])
 
 
 def rotate():
     new_grid = [[0] * n for _ in range(n)]
-    nn = n // 2
+    center = n // 2
+
+    # 구역 나눠서 돌리기
     for i in range(n):
         for j in range(n):
-            # 가운데 녀석들인 경우, 반시계로 회전
-            if i == nn or j == nn:
-                new_grid[n - 1 - j][i] = grid[i][j]
-            elif 0 <= i < nn and 0 <= j < nn:
-                new_grid[j][nn - 1 - i] = grid[i][j]
-            elif nn < i < n and 0 <= j < nn:
-                si = nn + 1
-                oi, oj = i - si, j
-                ni, nj = oj, nn - 1 - oi
-                new_grid[ni + si][nj] = grid[i][j]
-            elif 0 <= i < nn and nn < j < n:
-                sj = nn + 1
-                oi, oj = i, j - sj
-                ni, nj = oj, nn - 1 - oi
-                new_grid[ni][nj + sj] = grid[i][j]
-            else:
-                si, sj = nn + 1, nn + 1
-                oi, oj = i - si, j - sj
-                ni, nj = oj, nn - 1 - oi
-                new_grid[ni + si][nj + sj] = grid[i][j]
+            if i == center or j == center:
+                new_grid[n - j - 1][i] = grid[i][j]
+    # 첫번째 구역
+    for i in range(center):
+        for j in range(center):
+            new_grid[j][center - i - 1] = grid[i][j]
+    # 두번째 구역
+    for i in range(center):
+        for j in range(center + 1, n):
+            new_grid[j - center - 1][n - i - 1] = grid[i][j]
+    # 세번째 구역
+    for i in range(center + 1, n):
+        for j in range(center):
+            new_grid[center + j + 1][n - i - 1] = grid[i][j]
+    # 네번째 구역
+    for i in range(center + 1, n):
+        for j in range(center + 1, n):
+            new_grid[j][n - i + center] = grid[i][j]
+
     return new_grid
 
 
 n = int(input())
 grid = [list(map(int, input().split())) for _ in range(n)]
 
+ans_list = []
 for _ in range(4):
-    # 1. 그룹 찾기
-    visited = [[0] * n for _ in range(n)]
-    adj_group = [0]
-    adj_space = [0]
-    group_info = [0]
-    group_num = 1
+    # 0. 사용할 초기 배열 세팅
+    visited = [[-1] * n for _ in range(n)]
+    all_group_borders = []
+    group_cnts = []
+    group_values = []
+    border_dict = defaultdict(list)
+
+    # 1. 그룹 나누기
+    group_num = 0
     for i in range(n):
         for j in range(n):
-            if not visited[i][j]:
-                adj_group.append(set())
-                adj_space.append([0] * (group_num + 1))
-                group_info.append((i, j, bfs(i, j, group_num, grid[i][j])))
+            if visited[i][j] == -1:
+                group_values.append(grid[i][j])
+                g_border, g_cnt = bfs(group_num, i, j, grid[i][j])
+                all_group_borders.append(g_border)
+                group_cnts.append(g_cnt)
                 group_num += 1
 
-    # 2. 예술성 계산하기
-    for g in range(1, group_num - 1):
-        ans += get_value(g)
+    # 2. 인접한 부분 체크하기
+    check_border()
 
-    # 3. rotate
+    tmp_ans = 0
+    # 3. 조합 짜서 계산하기
+    get_value(0, -1, [])
+    ans_list.append(tmp_ans)
+
+    # 4. rotate
     grid = rotate()
 
-print(ans)
+print(sum(ans_list))
