@@ -33,7 +33,7 @@ ans = 0
 def get_bomb(sr, sc, color):
     global cur_bomb, red_cnt
     queue = deque([(sr, sc)])
-    visited[sr][sc] = 1
+    visited[sr][sc] = color
     tmp_red = 0
     tmp_bomb = set()
     tmp_bomb.add((sr, sc))
@@ -57,6 +57,7 @@ def get_bomb(sr, sc, color):
     if bomb_cnt >= 2:
         if bomb_cnt > len(cur_bomb):
             cur_bomb = list(tmp_bomb)[:]
+            red_cnt = tmp_red
         elif bomb_cnt == len(cur_bomb) and red_cnt > tmp_red:
             red_cnt = tmp_red
             cur_bomb = list(tmp_bomb)[:]
