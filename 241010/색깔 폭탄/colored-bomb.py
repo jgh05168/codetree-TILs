@@ -35,7 +35,9 @@ def get_bomb(sr, sc, color):
     queue = deque([(sr, sc)])
     visited[sr][sc] = 1
     tmp_red = 0
-    tmp_bomb = [(sr, sc)]
+    tmp_bomb = set()
+    tmp_bomb.add((sr, sc))
+    red_set = set()
 
     while queue:
         r, c = queue.popleft()
@@ -44,20 +46,20 @@ def get_bomb(sr, sc, color):
             if 0 <= nr < n and 0 <= nc < n:
                 if grid[nr][nc] == color and not visited[nr][nc]:
                     queue.append((nr, nc))
-                    tmp_bomb.append((nr, nc))
+                    tmp_bomb.add((nr, nc))
                     visited[nr][nc] = 1
-                elif not grid[nr][nc]:
+                elif not grid[nr][nc] and (nr, nc) not in tmp_bomb:
                     queue.append((nr, nc))
-                    tmp_bomb.append((nr, nc))
+                    tmp_bomb.add((nr, nc))
                     tmp_red += 1
     # 현재 최고 찾기
     bomb_cnt = len(tmp_bomb)
     if bomb_cnt >= 2:
         if bomb_cnt > len(cur_bomb):
-            cur_bomb = tmp_bomb[:]
+            cur_bomb = list(tmp_bomb)[:]
         elif bomb_cnt == len(cur_bomb) and red_cnt > tmp_red:
             red_cnt = tmp_red
-            cur_bomb = tmp_bomb[:]
+            cur_bomb = list(tmp_bomb)[:]
     return bomb_cnt
 
 
