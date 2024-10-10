@@ -84,7 +84,7 @@ def move_runners():
                 if (nr, nc) != catcher:
                     grid[r][c].remove(runner)
                     grid[nr][nc].append(runner)
-                    runners[runner] = (nr, nc, d)
+                    runners[runner] = (nr, nc, nd)
 
 def move_catcher():
     global catcher
@@ -110,7 +110,7 @@ def update_catcher(catcher):
     global reverse, catcher_d
     r, c = catcher
     if (r, c) == (0, 0) or (r, c) == (n // 2, n // 2):
-        reverse != reverse
+        reverse = True if not reverse else False
         catcher_d = (catcher_d + 2) % 4
     else:
         cur_loc = path[r][c]
