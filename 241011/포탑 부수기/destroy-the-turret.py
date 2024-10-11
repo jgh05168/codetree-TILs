@@ -64,9 +64,9 @@ def select_target():
 
 def laser(sr, sc):
     queue = deque([(sr, sc)])
-    visited = [[0] * n for _ in range(n)]
+    visited = [[0] * m for _ in range(n)]
     visited[sr][sc] = 1
-    path = [[0] * n for _ in range(n)]
+    path = [[0] * m for _ in range(n)]
     arrive = False
 
     while queue:
@@ -96,7 +96,7 @@ def laser(sr, sc):
 def bomb(r, c):
     path = set()
     path.add((r, c))
-    visited = [[0] * n for _ in range(n)]
+    visited = [[0] * m for _ in range(n)]
     for d in range(len(dr)):
         nr, nc = (r + dr[d]) % n, (c + dc[d]) % m
         if not visited[nr][nc] and grid[nr][nc] and (nr, nc) != (sr, sc):
