@@ -44,8 +44,8 @@ n x m
 
 from collections import deque
 
-dr = [0, 1, 0, -1]
-dc = [1, 0, -1, 0]
+dr = [0, 1, 0, -1, 1, 1, -1, -1]
+dc = [1, 0, -1, 0, 1, -1, -1, 1]
 turrets = []
 
 
@@ -95,11 +95,11 @@ def laser(sr, sc):
 
 def bomb(r, c):
     path = set()
-    path.add((sr, sc))
+    path.add((r, c))
     visited = [[0] * n for _ in range(n)]
     for d in range(len(dr)):
         nr, nc = (r + dr[d]) % n, (c + dc[d]) % m
-        if not visited[nr][nc] and grid[nr][nc]:
+        if not visited[nr][nc] and grid[nr][nc] and (nr, nc) != (sr, sc):
             visited[nr][nc] = 1
             path.add((nr, nc))
 
@@ -140,14 +140,16 @@ for _ in range(k):
 
     # 5. 포탑 데미지 입히기
     new_turrets = [(damage, 0, sr + sc, sc)]
+    grid[sr][sc] = [damage, 0]
     for r, c in target_list:
         if (r, c) == (er, ec):
             grid[r][c][0] -= damage
         else:
             grid[r][c][0] -= damage // 2
         if grid[r][c][0] <= 0:
-            grid[r][c][0] = 0
+            grid[r][c] = 0
         else:
+            grid[r][c][1] += 1
             new_turrets.append((grid[r][c][0], grid[r][c][1] + 1, r + c, c))
 
     # 6. 포탑 회복
