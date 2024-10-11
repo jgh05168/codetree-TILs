@@ -44,6 +44,8 @@ def bfs(sr, sc, cvs, p):
     else:
         queue = deque([(sr, sc)])
         visited[sr][sc] = 1
+    min_dist = n * n
+    basecamp_list = []
 
     while queue:
         r, c = queue.popleft()
@@ -58,12 +60,19 @@ def bfs(sr, sc, cvs, p):
                 # 베이스캠프 찾기
                 else:
                     if not grid[nr][nc] and basecamp[nr][nc]:
-                        people_loc.append((nr, nc))
-                        return
+                        if visited[r][c] + 1 < min_dist:
+                            min_dist = visited[r][c] + 1
+                            basecamp_list = [(nr, nc)]
+                        elif visited[r][c] + 1 == min_dist:
+                            basecamp_list.append((nr, nc))
+                        continue
                 if not grid[nr][nc]:
                     queue.append((nr, nc))
-                    visited[nr][nc] = 1
+                    visited[nr][nc] = visited[r][c] + 1
 
+    if not cvs:
+        basecamp_list.sort()
+        people_loc.append(basecamp_list[0])
 
 
 def move_people():
