@@ -150,7 +150,7 @@ for _ in range(k):
             grid[r][c] = 0
         else:
             grid[r][c][1] += 1
-            new_turrets.append((grid[r][c][0], grid[r][c][1] + 1, r + c, c))
+            new_turrets.append((grid[r][c][0], grid[r][c][1], r + c, c))
 
     # 6. 포탑 회복
     for a, time, r_c, c in turrets:
