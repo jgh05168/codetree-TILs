@@ -81,14 +81,15 @@ def packman_move(depth, r, c, catch, path):
 
 
 m, t = map(int, input().split())
-packman = tuple(map(int, input().split()))
+pr, pc = tuple(map(int, input().split()))
+packman = (pr - 1, pc - 1)
 for _ in range(m):
     r, c, d = map(int, input().split())
     grid[r - 1][c - 1][d - 1] += 1
 
 # 게임시작
 for _ in range(t):
-    max_catch = 0
+    max_catch = -1
     packman_path = []
 
     # 1. 팩맨 알 낳기
