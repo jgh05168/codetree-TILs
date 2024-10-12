@@ -76,7 +76,7 @@ def packman_move(depth, r, c, catch, path):
         return
     for d in range(0, d_len, 2):
         nr, nc = r + dr[d], c + dc[d]
-        if 0 <= nr < n and 0 <= nc < n and (nr, nc) not in path:
+        if 0 <= nr < n and 0 <= nc < n:
             packman_move(depth + 1, nr, nc, catch + sum(grid[nr][nc]), path + [(nr, nc)])
 
 
@@ -91,6 +91,7 @@ for _ in range(m):
 for _ in range(t):
     max_catch = -1
     packman_path = []
+    egg_grid = [[[0] * d_len for _ in range(n)] for _ in range(n)]
 
     # 1. 팩맨 알 낳기
     get_eggs()
@@ -101,10 +102,11 @@ for _ in range(t):
     # 3. 팩맨 이동
     packman_move(0, packman[0], packman[1], 0, [])
 
-    # 4. 먹어치운 애들 죽이기
+    # 4. 먹어치운 애들 죽이고 시체 업데이트
     for r, c in packman_path:
-        grid[r][c] = [0] * d_len
-        dead[r][c] = 3
+        if sum(grid[r][c]):
+            grid[r][c] = [0] * d_len
+            dead[r][c] = 3
 
     # 5. 죽은 애들 시체 업데이트
     for i in range(n):
