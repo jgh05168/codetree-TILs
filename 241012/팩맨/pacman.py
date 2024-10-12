@@ -76,8 +76,11 @@ def packman_move(depth, r, c, catch, path):
         return
     for d in range(0, d_len, 2):
         nr, nc = r + dr[d], c + dc[d]
-        if 0 <= nr < n and 0 <= nc < n and (nr, nc) not in path:
-            packman_move(depth + 1, nr, nc, catch + sum(grid[nr][nc]), path + [(nr, nc)])
+        if 0 <= nr < n and 0 <= nc < n:
+            if (nr, nc) not in path:
+                packman_move(depth + 1, nr, nc, catch + sum(grid[nr][nc]), path + [(nr, nc)])
+            else:
+                packman_move(depth + 1, nr, nc, catch, path + [(nr, nc)])
 
 
 m, t = map(int, input().split())
