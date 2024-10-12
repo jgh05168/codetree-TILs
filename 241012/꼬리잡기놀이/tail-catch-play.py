@@ -109,7 +109,7 @@ for time in range(k):
     team_move()
 
     # 2. 공 던지기
-    ball_num = time // n
+    ball_num = time % (4 * n)
     if 0 <= ball_num < n:
         r = time % n
         for c in range(n):
