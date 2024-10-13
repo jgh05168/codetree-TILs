@@ -194,6 +194,7 @@ def interaction(santa, r, c, d):
         new_santa = grid[nr][nc]
         santa_loc[santa] = (nr, nc)
         grid[nr][nc] = santa
+        santa = new_santa
         nr, nc = nr + dr[d], nc + dc[d]
     if 0 <= nr < N and 0 <= nc < N:
         grid[nr][nc] = new_santa
