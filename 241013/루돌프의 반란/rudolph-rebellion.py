@@ -199,7 +199,6 @@ def interaction(santa, r, c, d):
         grid[nr][nc] = new_santa
         santa_loc[new_santa] = (nr, nc)
     else:
-        grid[nr][nc] = 0
         santa_loc[new_santa] = 0
 
 
