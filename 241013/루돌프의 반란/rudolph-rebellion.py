@@ -159,10 +159,10 @@ def crash(santa, attacker, d):
         if not (0 <= r < N and 0 <= c < N):
             santa_loc[santa] = 0
         else:
+            santa_loc[santa] = (r, c)
             # 산타가 없다면 입력하고 끝
             if not grid[r][c]:
                 grid[r][c] = santa
-                santa_loc[santa] = (r, c)
             else:
                 # 상호작용
                 new_santa = grid[r][c]
@@ -234,6 +234,10 @@ for _ in range(M):
     for i in range(1, P + 1):
         if santa_loc[i]:
             score[i] += 1
+
+    # 5. 게임종료
+    if santa_loc.count(0) == P + 1:
+        break
 
 print(*score[1:])
 
