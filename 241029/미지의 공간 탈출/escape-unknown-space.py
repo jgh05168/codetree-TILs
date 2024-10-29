@@ -84,13 +84,13 @@ def move_symptom(t, n):
 
 def check_new_loc(cur_dim, r, c, m):
     # 동쪽
-    if not cur_dim:
-        return c, r
+    if cur_dim == 1:
+        return m - c - 1, r
     # 서쪽
-    elif cur_dim == 1:
+    elif cur_dim == 2:
         return m - c - 1, 0
     # 남쪽
-    elif cur_dim == 2:
+    elif cur_dim == 3:
         return r, c
     # 북쪽
     else:
@@ -110,7 +110,7 @@ def check_up_loc(way, cur_dim, r, c, m):
     # 이 때는 위에서 cur_dim으로 가는거임
     else:
         if cur_dim == 1:
-            return 0, m - c - 1
+            return 0, m - r - 1
         elif cur_dim == 2:
             return 0, r
         elif cur_dim == 3:
@@ -150,15 +150,16 @@ def move_timemachine(queue, n, m):
             if not new_dim:
                 r, c = check_new_loc(dim, r, c, m)
                 nr, nc = wall_bottom[r][c]
-                nnr, nnc = nr + dr[d], nc + dc[d]
-                if 0 <= nnr < n and 0 <= nnc < n:
-                    # 범위 안이지만, 장애물 있으면 continue해주기
-                    if grid[new_dim][nnr][nnc] == 1:
-                        continue
-                    if (nnr, nnc) == escape_loc:
-                        return True, []
-                    new_queue.append((nnr, nnc, new_dim))
-                    grid[new_dim][nnr][nnc] = 1
+                for nd in range(len(dr)):
+                    nnr, nnc = nr + dr[nd], nc + dc[nd]
+                    if 0 <= nnr < n and 0 <= nnc < n:
+                        # 범위 안이지만, 장애물 있으면 continue해주기
+                        if grid[new_dim][nnr][nnc] in [1, 3]:
+                            continue
+                        if (nnr, nnc) == escape_loc:
+                            return True, []
+                        new_queue.append((nnr, nnc, new_dim))
+                        grid[new_dim][nnr][nnc] = 1
             else:
                 # 북쪽만 예외 처리
                 # 다른 4방면 -> 북쪽
@@ -202,7 +203,9 @@ def main():
                     break
     # 이상 현상 입력
     for _ in range(f):
-        symptom_list.append(tuple(map(int, input().split())))
+        r, c, d, v = map(int, input().split())
+        grid[0][r][c] = 1
+        symptom_list.append((r, c, d, v))
     # 벽과 공간 링킹해주기
     wall_bottom = [[0] * m for _ in range(m)]
     flag = 0
@@ -231,7 +234,7 @@ def main():
         time += 1
 
     if isEscape:
-        print(time + 1)
+        print(time)
     else:
         print(-1)
 
