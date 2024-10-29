@@ -88,7 +88,7 @@ def check_new_loc(cur_dim, r, c, m):
         return m - c - 1, r
     # 서쪽
     elif cur_dim == 2:
-        return m - c - 1, 0
+        return c, 0
     # 남쪽
     elif cur_dim == 3:
         return r, c
