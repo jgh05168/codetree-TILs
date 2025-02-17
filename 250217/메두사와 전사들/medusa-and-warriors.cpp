@@ -108,7 +108,7 @@ int get_distance(int r1, int c1, int r2, int c2) {
 }
 
 
-void shortest_path(int sr, int sc) {
+int shortest_path(int sr, int sc) {
 	queue<pair<int, int>> q;
 	memset(visited, 0, sizeof(visited));
 	q.push({ sr, sc });
@@ -126,21 +126,18 @@ void shortest_path(int sr, int sc) {
 			if (isValid(nr, nc) && !visited[nr][nc] && !grid[nr][nc]) {
 				medusa_route[nr][nc] = { r, c };
 				if (nr == mr && nc == mc) {
-					flag = 1;
-					break;
+					return 1;
 				}
 				q.push({ nr, nc });
 				visited[nr][nc] = 1;
 			}
 		}
-		if (flag)
-			break;
 	}
-
+	return 0;
 }
 
 
-void init() {
+int init() {
 	cin >> n >> m;
 	cin >> mr >> mc >> end_r >> end_c;
 	int mr, mc;
@@ -155,7 +152,10 @@ void init() {
 	}
 
 	// 0. 메두사 최단경로 찾기
-	shortest_path(end_r, end_c);
+	int flag = 0;
+	flag = shortest_path(end_r, end_c);
+
+	return flag;
 
 }
 
@@ -366,9 +366,13 @@ void simulation() {
 
 
 int main() {
-	init();
-
-	simulation();
+	int game_start = 0;
+	game_start = init();
+	
+	if (!game_start)
+		cout << -1 << '\n';
+	else
+		simulation();
 
 	
 	return 0;
