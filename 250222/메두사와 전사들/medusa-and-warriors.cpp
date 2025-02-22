@@ -388,6 +388,8 @@ void simulation() {
 
 
 int main() {
+	cin.tie(0); ios::sync_with_stdio(false);
+
 	int game_start = init();
 	if (!game_start) {
 		cout << -1 << '\n';
