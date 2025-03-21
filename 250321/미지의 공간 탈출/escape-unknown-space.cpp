@@ -69,6 +69,8 @@ void spread_wierd(int cur_time) {
 			int nr = wierd_point[idx].r + dr[wierd_point[idx].d];
 			int nc = wierd_point[idx].c + dc[wierd_point[idx].d];
 			if (isValid(nr, nc, N) && !grid[0][nr][nc]) {
+				if (end_r == nr && end_c == nc)
+					continue;
 				grid[0][nr][nc] = 1;
 				wierd_point[idx].r = nr;
 				wierd_point[idx].c = nc;
