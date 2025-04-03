@@ -134,7 +134,7 @@ void bomb_attack(int sr, int sc, int er, int ec) {
 		if (!grid[nr][nc])
 			continue;
 		isWar[nr][nc] = 1;
-		if (nr == sr && sc == sc)
+		if (nr == sr && nc == sc)
 			continue;
 		grid[nr][nc] -= half_power;
 	}
@@ -201,6 +201,7 @@ void simulation() {
 
 		// 1. 공격자 선정
 		turret attacker = turret_list.front();
+		turret_list.front().time = 0;
 		grid[attacker.r][attacker.c] += n + m;
 		turret defender = turret_list.back();
 		isWar[attacker.r][attacker.c] = 1; isWar[defender.r][defender.c] = 1;
