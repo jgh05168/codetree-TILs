@@ -67,8 +67,6 @@ void bfs(int sr, int sc, int num) {
 				// 3과 1이 만나는 경우에 대해 판단해야함 -> 초기에는 무조건 2 방향으로 가야함
 				if (!flag && grid[nr][nc] > 2)
 					continue;
-				if (grid[nr][nc] == 2)
-					flag = 1;
 				// 팀 리스트 생성
 				if (grid[nr][nc] < 4)
 					team_list[num].push_back({ nr, nc });
@@ -77,6 +75,8 @@ void bfs(int sr, int sc, int num) {
 				path[0][num][nr][nc] = { r, c };
 			}
 		}
+		if (!q.empty())
+			flag = 1;
 	}
 	path[0][num][sr][sc] = { r, c };
 
